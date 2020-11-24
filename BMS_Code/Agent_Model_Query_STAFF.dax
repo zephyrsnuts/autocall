@@ -1,0 +1,32 @@
+﻿EVALUATE
+SUMMARIZECOLUMNS(
+	//Columns
+	'Dim - Calendar'[Fiscal Week],
+	'Hier - Agent'[Group Name],
+	'Hier - Agent'[BMS TS Commercial Region],
+	'Hier - Agent'[Sub-Region Name],
+	'Hier - Agent'[Location Name],
+	
+	//Filters
+    FILTER (
+		VALUES ( 'Dim - Calendar'[Fiscal Quarter Lag] ),
+		( 'Dim - Calendar'[Fiscal Quarter Lag] >= -5 )
+    ),
+    FILTER (
+		VALUES ( 'Dim - Calendar'[Fiscal Week Lag] ),
+		( 'Dim - Calendar'[Fiscal Week Lag] <= -1 )
+    ),
+    FILTER (
+		VALUES ( 'Hier - Agent'[Category Name] ),
+		( 'Hier - Agent'[Category Name] = "Tech Support" )
+    ),
+    FILTER (
+		VALUES ( 'Hier - Agent'[Group Name] ),
+		( 'Hier - Agent'[Group Name] = "Commercial Enterprise Services" )
+    ),
+
+	"PI_DENOM",DIVIDE('Fact - User Presnece SFDC'[Stafftime SFDC] - 'Fact - User Presnece SFDC'[LIGHTNING AUX REMOVE SECND],144000),
+	"PI_NUM",[Cases Completed (Owner) SFDC + DELTA]
+	
+//SUMMARIZECOLUMNS
+)

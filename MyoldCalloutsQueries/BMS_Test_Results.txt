@@ -1,0 +1,150 @@
+what hitesh uses
+"SFDC Case Type" <> Internal
+Department <> TS DOSD
+BMS Commercial Region <> Unknown, Blank
+
+the right kind of reporting for EMEA
+doesnt have to be replicated exactly
+
+the scorecard views and the decks that they are trying to build off it.
+
+the product level views
+
+emails are being sent out right now, neil said that our team can provide the data and fix problems but sending out emails.
+
+DIVIDE(CALCULATE(SUM(COUNT('Case Owner Vs Chat Owner'[SPSPE BMS Region])),ALL('Case Owner Vs Chat Owner'[SPSPE BMS Region])),CALCULATE(COUNT('Case Owner Vs Chat Owner'[SR Owner BMS Region]),ALL('Case Owner Vs Chat Owner'[SR Owner BMS Region])))
+
+
+
+
+RR2 = 
+    var currenthandled = VALUES('Case Owner Vs Chat Owner'[SPSPE BMS Region])
+    var currentgenerated = VALUES('Case Owner Vs Chat Owner'[SR Owner BMS Region])
+    var countforcurrentselection = SUM('Case Owner Vs Chat Owner'[Chat_Count])
+    var totalcounts = 
+    SWITCH(
+        TRUE(),
+        ISINSCOPE('Case Owner Vs Chat Owner'[SR Owner BMS Region]), CALCULATE(SUM('Case Owner Vs Chat Owner'[Chat_Count]), ALLSELECTED('Case Owner Vs Chat Owner'), 'Case Owner Vs Chat Owner'[SR Owner BMS Region] IN currentgenerated
+
+    
+))
+
+
+165584
+21485
+
+
+TS
+PBU
+ENTServ
+	14,343,353,170
+	21485
+	7.72
+TS
+PBU
+ENT
+not in midrange
+	165314
+	21465
+	7.70
+
+getting .1 more and more SR closed with only tech support and PBU filter.
+TS
+PBU
+	14,964,767,224?
+	21682
+
+TS
+PBU
+ENT
+not in midrange
+not in smac
+	165279
+	21440
+	7.70
+
+TS
+PBU
+ENT
+not in midrange
+not in smac
+not in tsdosd
+	165279
+	21440
+	7.70
+TS
+PBU
+not in midrange
+not in smac
+not in tsdosd
+	171,294
+	21,609
+	7.92
+
+
+CLOSEST MATCH
+TS
+PBU
+not in SMAC
+not in tsdosd
+	171,564
+	21,629
+	7.93
+
+TS
+PBU
+	172,772
+	21,682
+	7.96
+
+TS
+PBU
+not in TSDOSD
+	171,645
+	21663
+	7.92
+
+TS
+PBU
+not in SMAC
+	172,691?
+	21,648
+	7.97
+
+
+130816+40441
+170,857
+
+21728
+
+
+Wk 28
+
+TS
+PBU
+not in SMAC
+not in tsdosd
+160,554?
+20175
+
+w29
+171,728
+21,447
+8.00
+
+
+TS and PBU matches the validation file for Q3 but is not matching Q4
+for Q4 i have to use what Hitesh is using
+Case Type <> Internal
+Dept <> TS-DOSD
+
+TS
+PBU
+not TS-DOSD
+not Internal (do not apply to delta cases)
+W41
+167,695?
+21472
+7.8
+
+

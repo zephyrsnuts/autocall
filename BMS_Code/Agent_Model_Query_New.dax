@@ -1,0 +1,124 @@
+﻿EVALUATE
+SUMMARIZECOLUMNS(
+	//Columns
+	'Dim - Calendar'[Fiscal Week],
+	'Hier - Channel'[Region Desc],
+	'Hier - Channel'[SubRegion Desc],
+	'Hier - Product'[Product Type],
+	'Hier - Product'[Product Group],
+	'Hier - Agent'[Group Name],
+	'Hier - Agent'[BMS TS Commercial Region],
+	'Hier - Agent'[Sub-Region Name],
+	'Hier - Agent'[Location Name],
+	
+	//Filters
+    FILTER (
+		VALUES ( 'Dim - Calendar'[Fiscal Quarter Lag] ),
+		( 'Dim - Calendar'[Fiscal Quarter Lag] >= -5 )
+    ),
+    FILTER (
+		VALUES ( 'Dim - Calendar'[Fiscal Week Lag] ),
+		( 'Dim - Calendar'[Fiscal Week Lag] <= -1 )
+    ),
+    FILTER (
+		VALUES ( 'Hier - Agent'[Category Name] ),
+		( 'Hier - Agent'[Category Name] = "Tech Support" )
+    ),
+    FILTER (
+		VALUES ( 'Hier - Product'[Product Type] ),
+		( 'Hier - Product'[Product Type] = "Enterprise Solution Group PBU" )
+    ),
+    FILTER (
+    	VALUES ('Fact - CE Responses'[CE Warranty Status] ),
+    	( 'Fact - CE Responses'[CE Warranty Status] <> "OOW" )
+    ),
+    FILTER (
+    	VALUES ('Fact - CE Responses'[Response Status] ),
+    	( 'Fact - CE Responses'[Response Status] = "Completed" )
+    ),
+    FILTER (
+    	VALUES ( 'Fact - CE Disposition'[Survey ID] ),
+    	( 'Fact - CE Disposition'[Survey ID] <> "3076" )
+	),
+    FILTER (
+    	VALUES ( 'Fact - Case SFDC'[SFDC Case Type] ),
+    	( 'Fact - Case SFDC'[SFDC Case Type] <> "Internal" )
+	),
+    
+
+	//Expressions
+	//"CSAT",[Universal Sat %],
+	"CSAT_NUM",[Universal Satisfied Responses],
+	"CSAT_DENOM",[Universal Responses],
+	//"RDR",[Repeat Dispatch 7 Day Lag %],
+	"RDR_NUM",[Repeat Dispatch 7 day Numerator],
+	"RDR_DENOM",[Repeat Dispatch Denominator],
+	//"TTC",[TTC – SFDC + DELTA],
+	"TTC_NUM",CALCULATE(
+					    SUM('Fact - Case SFDC'[Time to Complete])/86400
+					    , 'Fact - Case SFDC'[Quick Contact Flag]<>"Y"
+					    , TREATAS(VALUES('Dim - Calendar'[DATE]),'Fact - Case SFDC'[Complete Date])
+					    , TREATAS(VALUES('Hier - Agent'[Agent Key]),'Fact - Case SFDC'[Agent_Owner_Key_ClosedDate])
+					  )
+					  + CALCULATE(
+					    SUM('Fact - SR'[CASE AGE])
+					    , 'Fact - SR'[SFDC Exlusion Flag]=0
+					    , TREATAS(VALUES('Dim - Calendar'[DATE]),'Fact - SR'[Activity Close Date])
+					    , TREATAS(VALUES('Hier - Agent'[Agent Key]),'Fact - SR'[OwnerKey_closedate])
+					  ),
+	"TTC_DENOM",[Cases Completed (Owner) SFDC + DELTA],
+	//"Backlog",[Aged Open Backlog %],
+	"Backlog_NUM",'UDT - Open Backlog'[Aged Open Backlog],
+	"Backlog_DENOM",[Weekly Open Backlog],
+	//"DSAT",[Universal Dissat %],
+	"DSAT_NUM",[Universal Dissatisfied Responses],
+	"DSAT_DENOM",[Universal Responses],	
+	//"TTR",[TTR – SFDC + DELTA],
+	"TTR_NUM",CALCULATE(
+					    SUM('Fact - Case SFDC'[Time to Resolve])/86400
+					    , 'Fact - Case SFDC'[Quick Contact Flag]<>"Y"
+					    , TREATAS(VALUES('Dim - Calendar'[DATE]),'Fact - Case SFDC'[Complete Date])
+					    , TREATAS(VALUES('Hier - Agent'[Agent Key]),'Fact - Case SFDC'[Agent_Owner_Key_ClosedDate])
+					  )
+					  + CALCULATE(
+					    [TTR (Days)]
+					    , 'Fact - SR'[SFDC Exlusion Flag]=0
+					    , TREATAS(VALUES('Dim - Calendar'[DATE]),'Fact - SR'[Activity Close Date])
+					    , TREATAS(VALUES('Hier - Agent'[Agent Key]),'Fact - SR'[OwnerKey_closedate])
+					  ),
+	"TTR_DENOM", 'Fact - Case SFDC'[Cases Completed (Owner) SFDC] 
+					+ CALCULATE('Fact - SR'[SR Resolved]
+							, 'Fact - SR'[SFDC Exlusion Flag]=0
+							, TREATAS(VALUES('Dim - Calendar'[DATE]), 'Fact - SR'[Activity Close Date])
+							, TREATAS(VALUES('Hier - Agent'[Agent Key]), 'Fact - SR'[Agent_Owner_Key])
+							),
+	//"PI",[LPI],
+	"PI_NUM",[Cases Completed (Owner) SFDC + DELTA]
+	//"PI_DENOM",DIVIDE('Fact - User Presnece SFDC'[Stafftime SFDC] - 'Fact - User Presnece SFDC'[LIGHTNING AUX REMOVE SECND],144000),
+	//"PI_DENOM",CALCULATE(
+	//						'Fact - User Presnece SFDC'[Stafftime SFDC]/144000
+	//						,'Hier - Agent'[Group Name] = "Commercial Enterprise Services"
+	//						)
+	//			- CALCULATE('Fact - User Presnece SFDC'[LIGHTNING AUX REMOVE SECND]/144000
+	//						,'Hier - Agent'[Group Name] = "Commercial Enterprise Services"
+	//						)
+	,"PI_DENOM",CALCULATE(DISTINCTCOUNT('Hier - Agent'[Badge Number]) //)  'Fact - SR'[Agent_Owner_Key]
+							, 'Fact - SR'[Activity Close Date]<>BLANK()
+							, 'Fact - SR'[Quick call flag]<>"Y"
+							, TREATAS(VALUES('Fact - SR'[Activity Close Date]), 'Dim - Calendar'[DATE])
+							, TREATAS(VALUES('Fact - SR'[Agent_Owner_Key]), 'Hier - Agent'[Agent Key])
+//							, TREATAS(VALUES('Fact - SR'[Product_Key]), 'Hier - Product'[Item Class])
+//							, TREATAS(VALUES('Fact - SR'[Channel_Key]), 'Hier - Channel'[ChannelKey])
+						),
+
+	"CSAT_NUM_PRO",CALCULATE([Universal Satisfied Responses],'Hier - Monarch Entiltlement'[Offer Level] = "ProSupport" || 'Hier - Monarch Entiltlement'[Offer Level] = "ProSupport Plus"),
+	"CSAT_DENOM_PRO",CALCULATE([Universal Responses],'Hier - Monarch Entiltlement'[Offer Level] = "ProSupport" || 'Hier - Monarch Entiltlement'[Offer Level] = "ProSupport Plus"),
+	"CSAT_NUM_BASIC",CALCULATE([Universal Satisfied Responses],'Hier - Monarch Entiltlement'[Offer Level] = "Basic" || 'Hier - Monarch Entiltlement'[Offer Level] = "NA"),
+	"CSAT_DENOM_BASIC",CALCULATE([Universal Responses],'Hier - Monarch Entiltlement'[Offer Level] = "Basic" || 'Hier - Monarch Entiltlement'[Offer Level] = "NA"),
+
+	"DSAT_NUM_PRO",CALCULATE([Universal Dissatisfied Responses],'Hier - Monarch Entiltlement'[Offer Level] = "ProSupport" || 'Hier - Monarch Entiltlement'[Offer Level] = "ProSupport Plus"),
+	"DSAT_DENOM_PRO",CALCULATE([Universal Responses],'Hier - Monarch Entiltlement'[Offer Level] = "ProSupport" || 'Hier - Monarch Entiltlement'[Offer Level] = "ProSupport Plus"),
+	"DSAT_NUM_BASIC",CALCULATE([Universal Dissatisfied Responses],'Hier - Monarch Entiltlement'[Offer Level] = "Basic" || 'Hier - Monarch Entiltlement'[Offer Level] = "NA"),
+	"DSAT_DENOM_BASIC",CALCULATE([Universal Responses],'Hier - Monarch Entiltlement'[Offer Level] = "Basic" || 'Hier - Monarch Entiltlement'[Offer Level] = "NA")
+//SUMMARIZECOLUMNS
+)

@@ -1,0 +1,51 @@
+﻿EVALUATE
+SUMMARIZECOLUMNS(
+vw_tj_Task11510_BMS_ISG[Fiscal_Year]
+,vw_tj_Task11510_BMS_ISG[Fiscal_Quarter]
+,vw_tj_Task11510_BMS_ISG[Fiscal_Week]
+,vw_tj_Task11510_BMS_ISG[Product_Type]
+,vw_tj_Task11510_BMS_ISG[BMS_Product]
+,"CSAT",vw_tj_Task11510_BMS_ISG[CSAT]
+
+,"CSAT_AVERAGE",CALCULATE(AVERAGEX(TOPN(26,SUMMARIZE(vw_tj_Task11510_BMS_ISG,vw_tj_Task11510_BMS_ISG[Fiscal_Week],vw_tj_Task11510_BMS_ISG[Product_Type],"CSAT",[CSAT]),[Fiscal_Week],DESC),[CSAT]),ALLEXCEPT(vw_tj_Task11510_BMS_ISG,vw_tj_Task11510_BMS_ISG[Product_Type]))
+,"StdDevVALUE",CALCULATE(STDEVX.P(TOPN(26,SUMMARIZE(vw_tj_Task11510_BMS_ISG,vw_tj_Task11510_BMS_ISG[Fiscal_Week],vw_tj_Task11510_BMS_ISG[Product_Type],"CSAT",[CSAT]),[Fiscal_Week],DESC),[CSAT]),ALLEXCEPT(vw_tj_Task11510_BMS_ISG,vw_tj_Task11510_BMS_ISG[Product_Type]))
+,"QUARTILEVALUE",CALCULATE(PERCENTILEX.INC(TOPN(26,SUMMARIZE(vw_tj_Task11510_BMS_ISG,vw_tj_Task11510_BMS_ISG[Fiscal_Week],vw_tj_Task11510_BMS_ISG[Product_Type],"CSAT",[CSAT]),[Fiscal_Week],DESC),[CSAT],.75),ALLEXCEPT(vw_tj_Task11510_BMS_ISG,vw_tj_Task11510_BMS_ISG[Product_Type]))
+
+,"AVERAGEVALUE2",AVERAGEX(TOPN(26,SUMMARIZE(vw_tj_Task11510_BMS_ISG,vw_tj_Task11510_BMS_ISG[Fiscal_Week],vw_tj_Task11510_BMS_ISG[BMS_Product],"CSAT",[CSAT]),[Fiscal_Week],DESC),[CSAT])
+,"StdDevVALUE2",CALCULATE(STDEVX.P(TOPN(26,SUMMARIZE(vw_tj_Task11510_BMS_ISG,vw_tj_Task11510_BMS_ISG[Fiscal_Week],vw_tj_Task11510_BMS_ISG[BMS_Product],"CSAT",[CSAT]),[Fiscal_Week],DESC),[CSAT]),ALLEXCEPT(vw_tj_Task11510_BMS_ISG,vw_tj_Task11510_BMS_ISG[BMS_Product]))
+,"QUARTILEVALUE2",CALCULATE(PERCENTILEX.INC(TOPN(26,SUMMARIZE(vw_tj_Task11510_BMS_ISG,vw_tj_Task11510_BMS_ISG[Fiscal_Week],vw_tj_Task11510_BMS_ISG[BMS_Product],"CSAT",[CSAT]),[Fiscal_Week],DESC),[CSAT],.75),ALLEXCEPT(vw_tj_Task11510_BMS_ISG,vw_tj_Task11510_BMS_ISG[BMS_Product]))
+)
+ORDER BY
+vw_tj_Task11510_BMS_ISG[Product_Type]
+,vw_tj_Task11510_BMS_ISG[BMS_Product]
+,vw_tj_Task11510_BMS_ISG[Fiscal_Year]
+,vw_tj_Task11510_BMS_ISG[Fiscal_Quarter]
+,vw_tj_Task11510_BMS_ISG[Fiscal_Week]
+
+
+
+=AVERAGEX(SUMMARIZE(DM,DM[Fiscal_Week],"CSAT",[CSAT]),[CSAT])
+
+
+=VAR SelectedMeasure =
+    VALUES ( 'MetricTable'[Metric] ) //you may use any function that returns just one value
+RETURN
+    IF (
+        HASONEVALUE( 'MetricTable'[Metric] ),
+        SWITCH (
+            SelectedMeasure,
+            "CSAT", [CSAT],
+            "CSAT-Pro", [CSAT-Pro],
+            "CSAT-Basic", [CSAT-Basic],
+            "OTS", [OTS],
+            "RDR", [RDR],
+            "Backlog", [Backlog],
+            "DSAT", [DSAT],
+            "DSAT-Pro", [DSAT-Pro],
+            "DSAT-Basic", [DSAT-Basic],
+            "SL", [SL],
+            "AHT", [AHT],
+            "TTR", [TTR],
+            "PI", [PI]
+        )
+    )

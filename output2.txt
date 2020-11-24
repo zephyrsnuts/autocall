@@ -1,0 +1,120 @@
+============ WEEKLY Storage DSAT Highlight ================
+ Storage
+ DSAT
+ Highlight
+ Storage Down -0.6 W35 at 2.0 
+ ----
+ NA Up 1.6 W35 at 3.0 
+   4week up trend at 3.0
+ LA Down -6.5 W35 at 0.0 
+ ----
+ EMEA Down -0.1 W35 at 1.5 
+  3week down trend at -0.7
+ APJ Down -1.2 W35 at 2.6 
+  3week down trend at -1.6
+ ============================================== 
+============ WEEKLY Server DSAT Opportunity ================
+ Server
+ DSAT
+ Opportunity
+ Server Up 0.9 W35 at 2.3 
+ ----
+ NA Up 1.6 W35 at 2.5 
+   3week up trend at 1.8
+ LA Up 0.0 W35 at 2.1 
+ ----
+ EMEA Up 0.6 W35 at 2.7 
+ ----
+ APJ Up 0.8 W35 at 1.8 
+ ----
+ ============================================== 
+============ WEEKLY Networking DSAT Opportunity ================
+ Networking
+ DSAT
+ Opportunity
+ Networking Up 1.1 W35 at 1.1 
+ ----
+ NA Up 0.0 W35 at 0.0 
+ ----
+ LA Up 0.0 W35 at 0.0 
+ ----
+ EMEA Up 6.2 W35 at 6.2 
+ ----
+ APJ Up 0.0 W35 at 0.0 
+ ----
+ ============================================== 
+============ WEEKLY Primary_Storage DSAT Highlight ================
+ Primary_Storage
+ DSAT
+ Highlight
+ Primary_Storage Down -1.0 W35 at 0.0 
+ ----
+ NA Up 0.0 W35 at 0.0 
+ ----
+ LA Up 0.0 W35 at 0.0 
+ ----
+ EMEA Down -2.3 W35 at 0.0 
+ ----
+ APJ Up 0.0 W35 at 0.0 
+ ----
+ ============================================== 
+============ WEEKLY Other DSAT Opportunity ================
+ Other
+ DSAT
+ Opportunity
+ Other Up 0.0 W35 at 0.0 
+ ----
+ NA Up 0.0 W35 at 0.0 
+ ----
+ LA Up 0.0 W35 at 0.0 
+ ----
+ EMEA Up 0.0 W35 at 0.0 
+ ----
+ APJ Up 0.0 W35 at 0.0 
+ ----
+ ============================================== 
+============ WEEKLY Midrange DSAT Highlight ================
+ Midrange
+ DSAT
+ Highlight
+ Midrange Down -0.8 W35 at 0.0 
+  3week down trend at -4.9
+ NA Up 0.0 W35 at 0.0 
+ ----
+ LA Up 0.0 W35 at 0.0 
+ ----
+ EMEA Down -2.5 W35 at 0.0 
+  3week down trend at -5.3
+ APJ Up 0.0 W35 at 0.0 
+ ----
+ ============================================== 
+============ WEEKLY HCI_Cloud DSAT Highlight ================
+ HCI_Cloud
+ DSAT
+ Highlight
+ HCI_Cloud Down -2.9 W35 at 0.0 
+  3week down trend at -3.5
+ NA Down -4.0 W35 at 0.0 
+  3week down trend at -4.3
+ LA Up 0.0 W35 at 0.0 
+ ----
+ EMEA Down -4.8 W35 at 0.0 
+  3week down trend at -6.7
+ APJ Up 0.0 W35 at 0.0 
+ ----
+ ============================================== 
+============ WEEKLY DPD_UDS DSAT Highlight ================
+ DPD_UDS
+ DSAT
+ Highlight
+ DPD_UDS Down -2.0 W35 at 0.0 
+ ----
+ NA Down -3.0 W35 at 0.0 
+ ----
+ LA Up 0.0 W35 at 0.0 
+ ----
+ EMEA Down -2.1 W35 at 0.0 
+ ----
+ APJ Up 0.0 W35 at 0.0 
+ ----
+ ============================================== 

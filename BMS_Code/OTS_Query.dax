@@ -1,0 +1,21 @@
+﻿SELECT 
+	{[Measures].[Dispatches]
+	,[Measures].[Dispatch Failures]} 
+	DIMENSION PROPERTIES MEMBER_NAME 
+	ON COLUMNS
+	
+	,NON EMPTY	
+	([Fiscal Calendar].[FISCAL WEEK].[FISCAL WEEK]
+	,[PRODUCT HIERARCHIES].[GROUP DESC].[GROUP DESC]
+	,[Region_Hierarchy].[Region].[Region]
+	,[Region_Hierarchy].[Sub Region1].[Sub Region1]
+	,[BMS].[BMS].[BMS] - { [BMS].[BMS].[],[BMS].[BMS].[Tech Direct],[BMS].[BMS].[Non-Tech Support] } //Only Tech Support Dispatches
+	,[TECH LOCATION].[Tech Location].[Tech Location]
+	)
+	ON ROWS
+FROM [dsv_FTCGlobal_Cube] 
+WHERE (
+	[DOSD_FLG].[DOSD FLG].&[0.] //No Tech Direct
+	,[PRODUCT HIERARCHIES].[TYPE DESC].[Enterprise Solution Group PBU] //Only Ent Products
+	,{[Fiscal Calendar].[FISCAL YEAR].[F2019],[Fiscal Calendar].[FISCAL YEAR].[F2020]}
+	)

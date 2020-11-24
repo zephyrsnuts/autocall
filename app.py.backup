@@ -1,0 +1,176 @@
+import pandas as pd
+import numpy as np
+import sys
+import os
+import dash
+import dash_core_components as dcc
+import dash_html_components as html
+import plotly.express as px
+from dash.dependencies import Input, Output
+import plotly.graph_objs as go
+
+# os.getcwd()
+
+# declare dash to run
+external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
+app=dash.Dash(__name__, external_stylesheets=external_stylesheets)
+
+#data import section
+data = (r'D:\git_stuff\Development\ACallouts\sources.csv')
+df=pd.read_csv(data)
+
+# extract required information like latest week and column names etc
+colnames = df.columns
+index = df.index
+latestweek = df['Fiscal_Week'].max()
+prevnbr = int(latestweek[-2:])-1
+prevweek = latestweek.replace(latestweek[-2:], str(prevnbr))
+uniqueweeks = df['Fiscal_Week'].unique()
+# add more unique columns here if required
+# only numeric columns
+ncols = ['EOQ_FLAG', 'China_Flag', 'CSAT_NUM','CSAT_DENOM', 'RDR_NUM', 'RDR_DENOM', 'TTC_NUM', 'TTC_DENOM','Backlog_NUM', 'Backlog_DENOM', 'DSAT_NUM', 'DSAT_DENOM', 'TTR_NUM','TTR_DENOM', 'PI_NUM', 'PI_DENOM', 'OTS_NUM', 'OTS_DENOM', 'SL_NUM','SL_DENOM', 'AHT_NUM', 'AHT_DENOM', 'CSAT_NUM_PRO', 'CSAT_DENOM_PRO','CSAT_NUM_BASIC', 'CSAT_DENOM_BASIC', 'DSAT_NUM_PRO', 'DSAT_DENOM_PRO','DSAT_NUM_BASIC', 'DSAT_DENOM_BASIC', 'PLAN_NUM', 'PLAN_DENOM','SEV1_SLO_NUM', 'SEV1_SLO_DENOM', 'AOP_NUM', 'AOP_DENOM']
+
+# latest week subset
+# use this df to create graphs which are related only to the latest week
+# like region compare product compare etc, they can be substets of this.
+# a sequence of boolean series
+criteria = df['Fiscal_Week'] == latestweek
+df_lw = df.loc[df['Fiscal_Week'] == latestweek, ncols]
+df_lw.head()
+
+
+# make a subset for only Fiscal week column and the CSAT columns to display in a visual
+ce_week = df.groupby('Fiscal_Week')[['CSAT_NUM', 'CSAT_DENOM']].sum()
+ce_week['CSAT'] = round(ce_week['CSAT_NUM']/ce_week['CSAT_DENOM']*100, 2)
+
+# use plotly express for the data
+# fig = px.line(ce_week, x=ce_week.index, y="CSAT")
+fig2 = px.scatter(df, x = 'Fiscal_Week', y = 'CSAT_NUM')
+
+# filtered_df = df.loc[df['Fiscal_Quarter_Lag'] == 0]
+# filtered_df2 = filtered_df.loc[:,['Fiscal_Quarter_Lag', 'Fiscal_Week', 'CSAT_NUM', 'CSAT_DENOM', 'Backlog_NUM', 'Backlog_DENOM']]
+#
+# filtered_df2
+
+# fdf = df.groupby(['Fiscal_Quarter_Lag', 'Fiscal_Week']).agg({'CSAT_NUM':[sum], 'CSAT_DENOM':[sum]})
+# fdf.columns = ['CSAT_NUM','CSAT_DENOM']
+# fdf = fdf.reset_index()
+# fdf
+
+# qd = df.loc[df['Fiscal_Quarter_Lag'] == 0]
+# qd['CSAT'] = qd['CSAT_NUM']/qd['CSAT_DENOM']*100
+
+# qp = df.loc[df['Fiscal_Quarter_Lag'] == 0]
+# qp2 = qp.groupby(['Fiscal_Quarter', 'Fiscal_Week']).agg({'CSAT_NUM':[sum], 'CSAT_DENOM':[sum]})
+# qp2.columns = ['CSAT_NUM', 'CSAT_DENOM']
+# qp2['CSAT'] = round(qp2['CSAT_NUM']/qp2['CSAT_DENOM']*100, 2)
+# qp['CSAT'] = round(qp['CSAT_NUM']/qp['CSAT_DENOM']*100, 2)
+
+# qd = df.loc[df['Fiscal_Quarter_Lag'] == 0]
+# qd2 = qp.groupby(['Fiscal_Quarter', 'Fiscal_Week']).agg({'CSAT_NUM':[sum], 'CSAT_DENOM':[sum]})
+# qd2 = qd2.reset_index()
+# qd2.columns = ['CSAT_NUM', 'CSAT_DENOM']
+# qd2['CSAT'] = round(qp2['CSAT_NUM']/qp2['CSAT_DENOM']*100, 2)
+# mins = qd2.CSAT.min()
+# maxs = qd2.CSAT.max()
+# counts = qd2.CSAT_NUM.sum()
+# counts_total = qd2.CSAT_DENOM.sum()
+#
+# diff_p = qd2.set_index('Fiscal_Week')
+# diff_p.CSAT.diff()
+
+# generate graphs.
+app.layout = html.Div(children=[html.H1(children='Metric Trend'),
+html.H4(children='Current Week "{}"'.format(latestweek)),
+dcc.Graph(id='CSAT_week_trend'),
+        dcc.Slider(
+                id = 'quarter_slider',
+                min = df['Fiscal_Quarter_Lag'].min(),
+                max= df['Fiscal_Quarter_Lag'].max(),
+                value = df['Fiscal_Quarter_Lag'].min(),
+                marks = {str(quarter):str(quarter) for quarter in df['Fiscal_Quarter_Lag'].unique()},
+                step = None
+        ),
+html.Div(children=html.H4(id='call_out')),
+html.Table([
+    html.Tr([html.Td("The selected quater is"), html.Td(id = 'QTNumber')]),
+    html.Tr([html.Td("CSAT for selected Quarter is"), html.Td(id = 'CSNum')]),
+    html.Tr([html.Td("CSAT min Week"), html.Td(id = 'CSmin')]),
+    html.Tr([html.Td("CSAT max Week "), html.Td(id = 'CSmax')]),
+    html.Tr([html.Td("CSAT counts"), html.Td(id = 'CScount')]),
+    html.Tr([html.Td("Total counts"), html.Td(id = 'CStcount')]),
+    html.Tr([html.Td("Difference for each week"), html.Tr(id = 'CSdiff')])
+]),
+dcc.Graph(id = 'Test',
+        figure = fig2
+)
+])
+
+
+@app.callback(
+    Output('CSAT_week_trend', 'figure'),
+    [Input('quarter_slider', 'value')]
+)
+def update_figure(selected_quarter):
+    filtered_df = df.loc[df['Fiscal_Quarter_Lag'] == selected_quarter]
+    fdf = filtered_df.groupby(['Fiscal_Quarter_Lag', 'Fiscal_Week']).agg({'CSAT_NUM':[sum], 'CSAT_DENOM':[sum]})
+    fdf.columns = ['CSAT_NUM','CSAT_DENOM']
+    fdf = fdf.reset_index()
+    fdf['CSAT'] = round(fdf['CSAT_NUM']/fdf['CSAT_DENOM']*100, 2)
+    filtered_df['CSAT'] = round(filtered_df['CSAT_NUM']/filtered_df['CSAT_DENOM']*100, 2)
+    # filtered_df2 = filtered_df.loc[:,['Fiscal_Quarter_Lag', 'Fiscal_Week', 'CSAT_NUM', 'CSAT_DENOM', 'Backlog_NUM', 'Backlog_DENOM']]
+    # filtered_df2['CSAT'] = round(filtered_df2['CSAT_NUM']/filtered_df2['CSAT_DENOM']*100, 2)
+    # filtered_df2['OBL'] = round(filtered_df2['Backlog_NUM']/filtered_df2['Backlog_DENOM']*100, 2)
+    fig = px.line(fdf, x = 'Fiscal_Week', y = 'CSAT')
+    fig.update_layout(transition_duration = 500)
+    return fig
+
+@app.callback(
+    # [Output('call_out', 'children'),
+    [Output('QTNumber', 'children'),
+    Output('CSNum', 'children'),
+    Output('CSmin', 'children'),
+    Output('CSmax', 'children'),
+    Output('CScount', 'children'),
+    Output('CStcount', 'children'),
+    Output('CSdiff', 'children')],
+    [Input('quarter_slider', 'value')]
+)
+def update_output(quartername):
+    quart = df.loc[df['Fiscal_Quarter_Lag'] == quartername]['Fiscal_Quarter'].unique()
+    quart = str(quart)
+    qp = df.loc[df['Fiscal_Quarter_Lag'] == quartername][['CSAT_NUM', 'CSAT_DENOM']].sum()
+    # qp2 = round(qp['CSAT_NUM']/qp['CSAT_DENOM']*100, 2)
+    qp['CSAT'] = round(qp['CSAT_NUM']/qp['CSAT_DENOM']*100, 2)
+    #for description
+    qd = df.loc[df['Fiscal_Quarter_Lag'] == quartername]
+    qd2 = qd.groupby(['Fiscal_Quarter', 'Fiscal_Week']).agg({'CSAT_NUM':[sum], 'CSAT_DENOM':[sum]})
+    # qd2 = qd2.reset_index()
+    qd2.columns = ['CSAT_NUM', 'CSAT_DENOM']
+    qd2['CSAT'] = round(qd2['CSAT_NUM']/qd2['CSAT_DENOM']*100, 2)
+    mins = qd2.CSAT.min()
+    maxs = qd2.CSAT.max()
+    counts = qd2.CSAT_NUM.sum()
+    counts_total = qd2.CSAT_DENOM.sum()
+    qd2['difference'] = qd2.CSAT.diff()
+    # qd = df.loc[df['Fiscal_Quarter_Lag'] == quartername]['CSAT_NUM'].describe()
+    # qd = qp.describe()
+    # qd = df.groupby(['Fiscal_Quarter']).agg({'CSAT_NUM':[sum], 'CSAT_DENOM':[sum]})
+    # qd.columns = ['CSAT_NUM','CSAT_DENOM']
+    # qd.reset_index()
+    # qd = df.loc[df['Fiscal_Quarter_Lag'] == quartername]['CSAT'] = df['CSAT_NUM']/df['CSAT_DENOM']*100
+    # qd2 = qp['CSAT'].describe()
+    return quart, qp['CSAT'], mins, maxs, counts, counts_total, qd2.loc[:,'difference']
+    # u'''
+    # The selected quater is {}
+    # CSAT for selected Quarter is {}
+    # CSAT min {}
+    # CSAT max {}
+    # CSAT counts {}
+    # Total counts {}
+    # Difference for each week {}
+    # '''.format(quart, qp['CSAT'], mins, maxs, counts, counts_total, dp2)
+
+
+if __name__=='__main__':
+    app.run_server(debug=True)
